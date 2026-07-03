@@ -10,6 +10,16 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file if it exists
+dot_env = BASE_DIR / '.env'
+if dot_env.exists():
+    with open(dot_env) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, val = line.split('=', 1)
+                os.environ[key.strip()] = val.strip()
+
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = 'django-insecure-%hm4+6f-^sf55bop2see=yr0$_c9gp3z0)uksob@158by^iqi1'
 DEBUG = True
