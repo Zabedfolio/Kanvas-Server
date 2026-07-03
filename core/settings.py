@@ -64,19 +64,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+import dj_database_url
+import os
+
 # Database
-# Enable Write-Ahead Logging (WAL) and synchronous normal for database concurrency in SQLite.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-            'timeout': 20,
-            'transaction_mode': 'IMMEDIATE',
-            'init_command': 'PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;',
+# Enable PostgreSQL in production when DATABASE_URL is provided, fallback to SQLite locally.
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+            'OPTIONS': {
+                'timeout': 20,
+                'transaction_mode': 'IMMEDIATE',
+                'init_command': 'PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;',
+            }
         }
     }
-}
 
 # Custom Auth Model
 AUTH_USER_MODEL = 'users.BetterAuthUser'
